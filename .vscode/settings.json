@@ -1,6 +1,7 @@
 {
     "C_Cpp.default.compilerPath": "/opt/homebrew/bin/g++-11",
     "files.associations": {
+        "*.embeddedhtml": "html",
         "iostream": "cpp",
         "__bit_reference": "cpp",
         "__bits": "cpp",
@@ -99,6 +100,15 @@
         "utility": "cpp",
         "ranges": "cpp",
         "stop_token": "cpp",
-        "text_encoding": "cpp"
+        "text_encoding": "cpp",
+        "__tree": "cpp",
+        "barrier": "cpp",
+        "future": "cpp",
+        "latch": "cpp",
+        "regex": "cpp",
+        "shared_mutex": "cpp",
+        "unordered_set": "cpp",
+        "__nullptr": "cpp",
+        "__string": "cpp"
     }
 }
