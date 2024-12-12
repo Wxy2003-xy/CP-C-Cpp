@@ -46,8 +46,4 @@ class ALU_32_bit {
         }
 };
 
-int main() {
-    return 0;
-}
-
 #endif

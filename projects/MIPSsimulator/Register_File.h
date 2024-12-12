@@ -45,12 +45,8 @@ class Register_File {
         }
         int write_back_register() {
             this->WR->write_register_from_32bit_immd(&WD);
+            return 0;
         }
 };
-
-int main() {
-    
-    return 0;
-}
 
 #endif

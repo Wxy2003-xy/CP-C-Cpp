@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <ctype.h>
+#include <string.h>
 
 enum INSTRUCTION_TYPE {
     R,
@@ -19,23 +20,19 @@ int parse_I_instruction(uint32_t* input, uint8_t* opcode, uint8_t* rs, uint8_t* 
 int parse_I_instruction_load_upper(uint32_t* input, uint8_t* opcode, uint8_t* rs, uint8_t* rt, uint16_t* immd);
 int parse_J_instruction(uint32_t* input, uint32_t* addr, uint32_t* PC);
 
-
-
-int main() {
-    return 0;
-}
-
 int validate_instruction_format_string(char* instr) {
-    int len = sizeof(instr) / sizeof(char);
+    int len = strlen(instr);
     return len == 32 ? 1 : 0;
 }
 
 int hex_to_binary(char* hex, uint32_t* bin) {
   //TODO   
+  return 0;
 }
 
 int binary_to_hex(uint32_t* bin, char* hex) {
   //TODO
+  return 0;
 }
 
 INSTRUCTION_TYPE instruction_type(uint32_t* instr) {
@@ -50,9 +47,9 @@ INSTRUCTION_TYPE instruction_type(uint32_t* instr) {
 int parse_R_instruction(uint32_t* input, uint8_t* rs, uint8_t* rt, uint8_t* rd, uint8_t* shamt, uint8_t* func) {
     uint32_t instr_value = *input;
     *rs = instr_value >> 21;
-    *rt = instr_value & 0x001F0000 >> 16;
-    *rd = instr_value & 0x0000F800 >> 11;
-    *shamt = instr_value & 0x000007C0 >> 6;
+    *rt = (instr_value & 0x001F0000) >> 16;
+    *rd = (instr_value & 0x0000F800) >> 11;
+    *shamt = (instr_value & 0x000007C0) >> 6;
     *func = instr_value & 0x0000003F;
     return 0;
 }
@@ -60,25 +57,17 @@ int parse_R_instruction(uint32_t* input, uint8_t* rs, uint8_t* rt, uint8_t* rd, 
 int parse_I_instruction(uint32_t* input, uint8_t* opcode, uint8_t* rs, uint8_t* rt, uint16_t* immd) {
     uint32_t instr_value = *input;
     *opcode = instr_value >> 26;
-    *rs =  instr_value & 0x03E00000 >> 21;
-    *rt = instr_value & 0x001F0000 >> 16;
+    *rs =  (instr_value & 0x03E00000) >> 21;
+    *rt = (instr_value & 0x001F0000) >> 16;
     *immd = instr_value & 0x0000FFFF;
-    return 0;
-}
-
-int parse_I_instruction_load_upper(uint32_t* input, uint8_t* opcode, uint8_t* rs, uint8_t* rt, uint16_t* immd) {
-    uint32_t instr_value = *input;
-    *opcode = instr_value >> 26;
-    *rs =  instr_value & 0x03E00000 >> 21;
-    *rt = instr_value & 0x001F0000 >> 16;
-    *immd = instr_value << 16;
     return 0;
 }
 
 int parse_J_instruction(uint32_t* input, uint32_t* addr, uint32_t* PC) {
     uint32_t instr_value = *input;
     uint32_t address_PC = *PC & 0xF0000000;
-    uint32_t address_value = instr_value & 0x03FFFFFF << 2 | address_PC;
+    uint32_t address_value = ((instr_value & 0x03FFFFFF) << 2) | address_PC;
+    *addr = address_value;
     return 0;
 }
 
