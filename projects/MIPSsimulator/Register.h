@@ -1,5 +1,7 @@
-#include <iostream>
+#ifndef REGISTER_H
+#define REGISTER_H
 #include <ctype.h>
+#include <iostream>
 
 class Register {
     protected:
@@ -8,10 +10,14 @@ class Register {
         virtual uint32_t read_register() {
             return this->register_content;
         }
+        virtual int write_register_from_32bit_immd(uint32_t* full_register_content) {
+            this->register_content = *full_register_content;
+            return 0;
+        }
 };
 
 class General_Register : Register {
-    private:
+    protected:
         uint8_t register_no;
     public: 
         General_Register(uint8_t register_no) {
@@ -22,10 +28,6 @@ class General_Register : Register {
             return this->register_no;
         }
 
-        int write_register_from_32bit_immd(uint32_t* full_register_content) {
-            this->register_content = *full_register_content;
-            return 0;
-        }
         int write_register_from_register(Register* source_register) {
             if (!source_register) {
                 return 1;
@@ -119,38 +121,9 @@ class Return_Address_Register : public Register {
     private:
     public:
 };
-class Register_File {
-    private:
-        Register* registers[32];
-    public:
-        Register_File() {
-            this->registers[0] = new Zero_Register(); // assign Zero_Register to $0
-            this->registers[1] = new Assembler_Temporary_Register(); // assign assembler_temporary_register to $1
-            this->registers[2] = new Value_for_Function_eval_Register();
-            this->registers[3] = new Value_for_Function_eval_Register(); // v0-v2 
-            int i, j, k, l;
-            for (int i = 4; i <= 7; i++) {
-                this->registers[i] = new Arguement_Register(); // a0-a3
-            }
-            for (int j = 8; j <= 15; j++) {
-                this->registers[j] = new Temporary_Register(); // t0-t7
-            }
-            for (int k = 16; k <= 23; k++) {
-                this->registers[j] = new Saved_Temporary_Register(); // s0-s7
-            }
-            for (int l = 24; l <= 25; l++) {
-                this->registers[l] = new Temporary_Register(); // t8-t9
-            }
-            this->registers[26] = new Kernel_Register();
-            this->registers[27] = new Kernel_Register();
-            this->registers[28] = new Global_Pointer_Register();
-            this->registers[29] = new Stack_Pointer_Register();
-            this->registers[30] = new Frame_Pointer_Register();
-            this->registers[31] = new Return_Address_Register();
-        }
+
+class Pipeline_Register : public Register {
+
 };
 
-int main() {
-    
-    return 0;
-}
+#endif

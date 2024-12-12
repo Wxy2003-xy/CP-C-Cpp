@@ -14,7 +14,6 @@ class Solution {
                 }
             }
             for (int i = 0; i < max; i++) {
-                POLL_HUphp
                 
             }
         }
