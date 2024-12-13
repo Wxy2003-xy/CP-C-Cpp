@@ -20,7 +20,7 @@ class ALU_32_bit {
         ALU_32_bit() {
 
         }
-        int compute(uint32_t* res, Pipeline_Register* dest, bool* is_zero, uint32_t* input_A, uint32_t* input_B, uint8_t* ALUctrl) {
+        int compute(uint32_t* res, bool* is_zero, uint32_t* input_A, uint32_t* input_B, uint4_t* ALUctrl) {
             if (*ALUctrl == 0b0000) {   // and op
                 *res = *input_A & *input_B;
             } else if (*ALUctrl == 0b0001) { // or op
@@ -44,6 +44,7 @@ class ALU_32_bit {
         ~ALU_32_bit() {
 
         }
+    friend class CPU;
 };
 
 #endif

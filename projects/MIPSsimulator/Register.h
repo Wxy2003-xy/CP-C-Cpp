@@ -5,13 +5,13 @@
 
 class Register {
     protected:
-        uint32_t register_content;
+        uint32_t* register_content;
     public:
         virtual uint32_t read_register() {
-            return this->register_content;
+            return *this->register_content;
         }
         virtual int write_register_from_32bit_immd(uint32_t* full_register_content) {
-            this->register_content = *full_register_content;
+            *this->register_content = *full_register_content;
             return 0;
         }
         friend class CPU;
@@ -34,7 +34,7 @@ class General_Register : Register {
                 return 1;
             }
             uint32_t source_value = source_register->read_register();
-            this->register_content = source_value;
+            *this->register_content = source_value;
             return 0;
         }
         int load_upper(uint16_t* upper) {
@@ -43,8 +43,8 @@ class General_Register : Register {
             }
             uint16_t upper_value = *upper;
             uint32_t shifted_value = static_cast<uint32_t>(upper_value) << 16;
-            this->register_content = this->register_content & 0x0000FFFF;
-            this->register_content = this->register_content | shifted_value;
+            *this->register_content = *this->register_content & 0x0000FFFF;
+            *this->register_content = *this->register_content | shifted_value;
             return 0;
         }
         int load_lower(uint16_t* lower) {
@@ -53,8 +53,8 @@ class General_Register : Register {
             }
             uint16_t lower_value = *lower;
             uint32_t shifted_value = static_cast<uint32_t>(lower_value);
-            this->register_content = this->register_content & 0xFFFF0000;
-            this->register_content = this->register_content | shifted_value;
+            *this->register_content = *this->register_content & 0xFFFF0000;
+            *this->register_content = *this->register_content | shifted_value;
             return 0;
         }
         friend class CPU;

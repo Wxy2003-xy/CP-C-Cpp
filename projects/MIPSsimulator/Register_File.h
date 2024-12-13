@@ -9,14 +9,23 @@
 using namespace std;
 class Register_File {
     private:
+        /**
+         * Address reference in CPU:
+         *      RR1, RR2, RD1, RD2, WR, WD
+         * 
+        */
         Control* control;
         Register* registers[32];
+        uint5_t* rr1_no;
+        uint5_t* rr2_no;
+        uint5_t* wr_no;
+
         Register* RR1;
         Register* RR2;
         Register* WR;
         uint32_t* RD1;
         uint32_t* RD2;
-        uint32_t WD;
+        uint32_t* WD;
         bool RegWrite;
         Register_File() {
             this->registers[0] = new Zero_Register(); // assign Zero_Register to $0
@@ -43,6 +52,18 @@ class Register_File {
             this->registers[30] = new Frame_Pointer_Register();
             this->registers[31] = new Return_Address_Register();
         }
+        int set_RR1() {
+            RR1 = registers[*this->rr1_no];
+            return 0;
+        }
+        int set_RR2() {
+            RR2 = registers[*this->rr2_no];
+            return 0;
+        }
+        int set_WR() {
+            WR = registers[*this->wr_no];
+            return 0;
+        }
         int read_RR1() {
             *this->RD1 = this->RR1->read_register();
         }
@@ -51,14 +72,14 @@ class Register_File {
         }
 
         int write_back_data(uint32_t* wb) {
-            this->WD = *wb;
+            *this->WD = *wb;
             return 0;
         }
         int write_back_register() {
             if (!this->control->_reg_write()) {
                 return 1;
             }
-            this->WR->write_register_from_32bit_immd(&WD);
+            this->WR->write_register_from_32bit_immd(WD);
             return 0;
         }
 

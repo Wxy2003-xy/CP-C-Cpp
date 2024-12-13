@@ -19,18 +19,18 @@ class MUX_2_1 : public MUX {
         uint32_t* source1;
         uint32_t* source2;
         bool* signal;
-        
-        MUX_2_1(uint32_t* source1, uint32_t* source2, bool* signal) {
+        uint32_t* output;
+        MUX_2_1(uint32_t* source1, uint32_t* source2, bool* signal, uint32_t* output) {
             this->source1 = source1;
             this->source2 = source2;
             this->signal = signal;
         }
         uint32_t output() {
             if (*signal == 0) {
-                return *source1;
+                *output = *source1;
             }
             if (*signal == 1) {
-                return *source2;
+                *output = *source2;
             }
         }
         friend class CPU;
@@ -41,18 +41,19 @@ class MUX_2_1_5_bit : public MUX {
         uint5_t* source1;
         uint5_t* source2;
         bool* signal;
+        uint5_t* output;
         
-        MUX_2_1_5_bit(uint5_t* source1, uint5_t* source2, bool* signal) {
+        MUX_2_1_5_bit(uint5_t* source1, uint5_t* source2, bool* signal, uint5_t* output) {
             this->source1 = source1;
             this->source2 = source2;
             this->signal = signal;
         }
-        uint5_t output() {
+        void output() {
             if (*signal == 0) {
-                return *source1;
+                *output = *source1;
             }
             if (*signal == 1) {
-                return *source2;
+                *output = *source2;
             }
         }
         friend class CPU;
@@ -119,6 +120,7 @@ class CPU {
         bool mem_read;
         bool mem_write;
         bool branch;
+        bool is_zero;
 
         // Utility components
         MUX_2_1_5_bit* reg_dst_MUX;
@@ -129,42 +131,57 @@ class CPU {
         uint32_t alu_result;
         uint32_t extended_value;
         uint32_t extended_shifted_value;
+        uint32_t alu_src_source2;
+        uint6_t opcode; //[26:31]
+        uint5_t rs; //[25:21]
         uint5_t rt; //[20:16]
         uint5_t rd; //[15:11]
+        uint5_t shamt; //[10:6]
+        uint6_t func; //[5:0]
+        uint16_t immd; //[15:0]
     public:
         CPU(int instruction_size, int data_size) 
             : instruction_memory(std::make_unique<Instruction_Memory>(instruction_size)),
               data_memory(std::make_unique<Data_Memory>(data_size)),
               PC(*instruction_memory->virtual_PC) {
             // component instantiation:
-            reg_dst_MUX = new MUX_2_1_5_bit(&rt, &rd, &reg_dst);
-            alu_src_MUX = new MUX_2_1(this->register_file.RD2, &extended_value, &alu_src);
-            PC_src_MUX = new MUX_2_1(&next_PC, &branch_address, &branch);
-            mem_to_reg_MUX = new MUX_2_1(&alu_result, this->data_memory->memory_read, &mem_to_reg);
+            reg_dst_MUX = new MUX_2_1_5_bit(&rt, &rd, &reg_dst, this->register_file.wr_no);
+            alu_src_MUX = new MUX_2_1(this->register_file.RD2, &extended_value, &alu_src, &alu_src_source2);
+            PC_src_MUX = new MUX_2_1(&next_PC, &branch_address, &branch, &next_PC);
+            mem_to_reg_MUX = new MUX_2_1(&alu_result, this->data_memory->memory_read, &mem_to_reg, this->register_file.WD);
         }
         int __instruction_fetch() {
             uint32_t* current_instruction = this->instruction_memory->virtual_PC;
             this->instruction_memory->fetch_instruction_tmp_register(current_instruction, this->tmp_instr_register);
-
-
             return 0;
-            
+
         }
         int __instruction_decode() {
+            uint32_t instruction_value = this->tmp_instr_register->read_register();
+            INSTRUCTION_TYPE type = instruction_type(&instruction_value);
+            if (type == r) {
+                parse_R_instruction(&instruction_value, &rs, &rt, &rd, &shamt, &func);
+            }
+            if (type == i) {
+                parse_I_instruction(&instruction_value, &opcode, &rs, &rt, &immd);
+            }
+            if (type == j) {
+                parse_J_instruction(&instruction_value, &branch_address, &PC);
+            }
             return 0;
-
         }
         int __execute_alu() {
+            this->alu.compute(&alu_result, &is_zero, this->register_file.RD1,
+                              &alu_src_source2, &this->control.alu_ctrl);
+            // TODO: forwarding pipeline
             return 0;
-
         }
         int __memory() {
             return 0;
-
         }
         int __write_back() {
+            this->register_file.write_back_register();
             return 0;
-
         }
 };
 
