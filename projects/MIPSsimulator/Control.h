@@ -9,7 +9,7 @@
 using namespace std;
 
 class Control {
-    protected:
+    private:
         uint2_t alu_op;
         uint4_t alu_ctrl;
         // MSB -> LSB
@@ -60,8 +60,6 @@ class Control {
             alu_ctrl = alu_ctrl | alu_ctrl0;
             return alu_ctrl;
         }
-    
-    public: 
         int generate_control_signals(uint6_t* opcode, uint6_t* func,
                                      uint2_t* alu_op, uint7_t* control, uint4_t* alu_ctrl) {
             if (!opcode || !func || !alu_op || !control || !alu_ctrl) {
@@ -93,6 +91,31 @@ class Control {
             *alu_ctrl = generate_ALU_control(func, alu_op);
             return 0;
         }
+        // getters
+        // RegDst, ALUSrc, MemToReg, RegWrite, MemRead, MemWrite, Branch
+        bool _reg_dst() {
+            return this->ctrl.value >> 6;
+        }
+        bool _alu_src() {
+            return (this->ctrl.value >> 5) & 1;
+        }
+        bool _mem_to_reg() {
+            return (this->ctrl.value >> 4) & 1;
+        }
+        bool _reg_write() {
+            return (this->ctrl.value >> 3) & 1;
+        }
+        bool _mem_read() {
+            return (this->ctrl.value >> 2) & 1;
+        }
+        bool _mem_write() {
+            return (this->ctrl.value >> 1) & 1;
+        }
+        bool _branch() {
+            return this->ctrl.value & 1;
+        }
+        friend class CPU;
+        friend class Register_File;
 };
 
 #endif

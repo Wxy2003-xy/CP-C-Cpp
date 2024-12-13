@@ -14,12 +14,13 @@ class Register {
             this->register_content = *full_register_content;
             return 0;
         }
+        friend class CPU;
+        friend class Register_File;
 };
 
 class General_Register : Register {
     protected:
         uint8_t register_no;
-    public: 
         General_Register(uint8_t register_no) {
             this->register_no = register_no;
             this->register_content = 0x00000000; // initialized to 0;
@@ -56,6 +57,9 @@ class General_Register : Register {
             this->register_content = this->register_content | shifted_value;
             return 0;
         }
+        friend class CPU;
+        friend class Register_File;
+        friend class Register;
 };
 
 class Zero_Register : public Register {

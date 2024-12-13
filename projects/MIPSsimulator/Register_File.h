@@ -5,17 +5,19 @@
 #include <ctype.h>
 #include "Register.h"
 #include "Control.h"
+#include "mips_ISA.h"
+using namespace std;
 class Register_File {
-    protected:
+    private:
         Control* control;
-
         Register* registers[32];
         Register* RR1;
         Register* RR2;
         Register* WR;
+        uint32_t* RD1;
+        uint32_t* RD2;
         uint32_t WD;
         bool RegWrite;
-    public:
         Register_File() {
             this->registers[0] = new Zero_Register(); // assign Zero_Register to $0
             this->registers[1] = new Assembler_Temporary_Register(); // assign assembler_temporary_register to $1
@@ -41,15 +43,29 @@ class Register_File {
             this->registers[30] = new Frame_Pointer_Register();
             this->registers[31] = new Return_Address_Register();
         }
+        int read_RR1() {
+            *this->RD1 = this->RR1->read_register();
+        }
+        int read_RR2() {
+            *this->RD2 = this->RR2->read_register();
+        }
 
         int write_back_data(uint32_t* wb) {
             this->WD = *wb;
             return 0;
         }
         int write_back_register() {
+            if (!this->control->_reg_write()) {
+                return 1;
+            }
             this->WR->write_register_from_32bit_immd(&WD);
             return 0;
         }
+
+        ~Register_File() {
+            cout << "Register_file has been destructed." << endl;
+        }
+    friend class CPU;
 };
 
 #endif

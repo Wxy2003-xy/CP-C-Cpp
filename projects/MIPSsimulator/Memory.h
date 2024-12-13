@@ -69,6 +69,7 @@ class Instruction_Memory : public Memory {
             return 0;
             
         }
+    friend class CPU;
 };
 
 class Data_Memory : public Memory {
@@ -76,10 +77,12 @@ class Data_Memory : public Memory {
         uint32_t* read_address;
         uint32_t* write_address;
         uint32_t* memory_pointer;
+        uint32_t* memory_read;
     public:
         uint32_t* data;
         Data_Memory(int data_size) {
             this->data = (uint32_t*) malloc(sizeof(uint32_t) * data_size);
         }
+    friend class CPU;
 };
 #endif
