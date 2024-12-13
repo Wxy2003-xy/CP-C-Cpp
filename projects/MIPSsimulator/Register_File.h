@@ -4,8 +4,11 @@
 #include <iostream>
 #include <ctype.h>
 #include "Register.h"
+#include "Control.h"
 class Register_File {
     protected:
+        Control* control;
+
         Register* registers[32];
         Register* RR1;
         Register* RR2;
