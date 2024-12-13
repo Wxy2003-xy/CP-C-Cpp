@@ -11,33 +11,6 @@ enum INSTRUCTION_TYPE {
     j,
 };
 
-enum R_MNEMONIC {
-    ADD,
-    SUB,
-    AND,
-    OR,
-    NOR,
-    SLL,
-    SRL,
-    SLT,
-};
-
-enum I_MNEMONIC {
-    ADDI,
-    SUBI,
-    ANDI,
-    ORI,
-    NORI,
-    BEQ,
-    BNE,
-    LW,
-    LUI,
-    SW,
-};
-
-enum J_MNEMONIC {
-    JUMP
-};
 // bitfield implemenation of uint5_t
 struct uint5_t {
     uint8_t value : 5; // Use 5 bits from a uint8_t

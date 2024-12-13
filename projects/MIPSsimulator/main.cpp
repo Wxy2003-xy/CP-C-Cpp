@@ -6,6 +6,7 @@
 #include "ALU.h"
 #include "Memory.h"
 #include "CPU.h"
+#include "MIPS_Parser.h"
 
 /**
  * Compile using 
@@ -15,6 +16,6 @@
 
 int main() {
     CPU* cpu = new CPU(1024, 1024);
-    
+
     return 0;
 }
