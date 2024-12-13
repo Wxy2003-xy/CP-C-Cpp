@@ -7,9 +7,14 @@
 #include "Memory.h"
 #include "CPU.h"
 
+/**
+ * Compile using 
+ *      g++ -std=c++14 -o main main.cpp
+ * 
+*/
 
 int main() {
-
-
+    CPU* cpu = new CPU(1024, 1024);
+    
     return 0;
 }

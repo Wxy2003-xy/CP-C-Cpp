@@ -66,9 +66,11 @@ class Register_File {
         }
         int read_RR1() {
             *this->RD1 = this->RR1->read_register();
+            return 0;
         }
         int read_RR2() {
             *this->RD2 = this->RR2->read_register();
+            return 0;
         }
 
         int write_back_data(uint32_t* wb) {

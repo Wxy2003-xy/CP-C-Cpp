@@ -9,6 +9,12 @@
 #include "ALU.h"
 #include "Memory.h"
 using namespace std;
+
+/**
+ * Compile using g++14 or above
+ * 
+*/
+
 // simple MUX implememtation that suports up to 4 sources
 class MUX {
     
@@ -25,13 +31,14 @@ class MUX_2_1 : public MUX {
             this->source2 = source2;
             this->signal = signal;
         }
-        uint32_t output() {
+        int get() {
             if (*signal == 0) {
                 *output = *source1;
             }
             if (*signal == 1) {
                 *output = *source2;
             }
+            return 0;
         }
         friend class CPU;
 };
@@ -48,13 +55,14 @@ class MUX_2_1_5_bit : public MUX {
             this->source2 = source2;
             this->signal = signal;
         }
-        void output() {
+        int get() {
             if (*signal == 0) {
                 *output = *source1;
             }
             if (*signal == 1) {
                 *output = *source2;
             }
+            return 0;
         }
         friend class CPU;
 };
@@ -105,6 +113,8 @@ class CPU {
         // Memory, reference, as memory are separately instantiated.
         unique_ptr<Instruction_Memory> instruction_memory;
         unique_ptr<Data_Memory> data_memory;
+        int instruction_memory_size;
+        int data_memory_size;
 
         // Program counter
         uint32_t PC;
@@ -141,10 +151,12 @@ class CPU {
         uint16_t immd; //[15:0]
     public:
         CPU(int instruction_size, int data_size) 
-            : instruction_memory(std::make_unique<Instruction_Memory>(instruction_size)),
-              data_memory(std::make_unique<Data_Memory>(data_size)),
+            : instruction_memory(make_unique<Instruction_Memory>(instruction_size)),
+              data_memory(make_unique<Data_Memory>(data_size)),
               PC(*instruction_memory->virtual_PC) {
             // component instantiation:
+            this->instruction_memory_size = instruction_size;
+            this->data_memory_size = data_size;
             reg_dst_MUX = new MUX_2_1_5_bit(&rt, &rd, &reg_dst, this->register_file.wr_no);
             alu_src_MUX = new MUX_2_1(this->register_file.RD2, &extended_value, &alu_src, &alu_src_source2);
             PC_src_MUX = new MUX_2_1(&next_PC, &branch_address, &branch, &next_PC);
