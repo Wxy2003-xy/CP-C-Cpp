@@ -16,6 +16,12 @@ class One_bit_ALU {
 
 class ALU_32_bit {
     protected:
+        bool add_with_overflow(uint32_t* result, uint32_t a, uint32_t b) {
+            uint64_t temp = static_cast<uint64_t>(a) + b;
+            *result = static_cast<uint32_t>(temp);
+            return temp > UINT32_MAX; // Overflow if result exceeds 32 bits
+        }
+
     public:
         ALU_32_bit() {
 
