@@ -1,0 +1,6 @@
+Compile with:
+gcc -O3 -g -std=c99 -Wall -Wextra -Wmissing-prototypes \
+  -Wstrict-prototypes -Wold-style-definition c.c -o c
+
+Diff:
+./c | diff c.c -
