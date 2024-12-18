@@ -109,6 +109,7 @@
         "shared_mutex": "cpp",
         "unordered_set": "cpp",
         "__nullptr": "cpp",
-        "__string": "cpp"
+        "__string": "cpp",
+        "filesystem": "cpp"
     }
 }
