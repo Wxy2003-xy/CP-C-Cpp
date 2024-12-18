@@ -21,7 +21,7 @@ private:
     int size;
     vector<int> nodes;  // List of nodes in the graph
     vector<tuple<int, int, int>> edges;  // List of edges (src, dest, weight)
-    vector<vector<tuple<int, int>>> adjList;  // Adjacency list (node -> [(dest, weight)])
+    vector<vector<pair<int, int>>> adjList;  // Adjacency list (node -> [(dest, weight)])
 
 public:
     // Constructor to initialize with nodes
@@ -52,10 +52,23 @@ public:
 
     // Add an edge to the adjacency list (src -> dest with weight)
     void addEdgeList(int src, int dest, int weight) {
-        this->adjList[src].push_back(make_tuple(dest, weight));
+        this->adjList[src].push_back(make_pair(dest, weight));
+        this->adjList[dest].push_back(make_pair(src, weight));
         cout<< "adding: "<< src << " --> " << dest<<" weight: "<< weight <<endl;
     }
-
+    void addEdgeListDirected(int src, int dest, int weight) {
+        this->adjList[src].push_back(make_pair(dest, weight));
+        cout<< "adding: "<< src << " --> " << dest<<" weight: "<< weight <<endl;
+    }
+    void printGraph() {
+        for (int i = 0; i < adjList.size(); i++) {
+            cout<<"Node " <<i<<": ";
+            for (int j = 0; j < adjList[i].size(); j++) {
+                cout << adjList[i][j].first << ", ";
+            }
+            cout<<endl;
+        }
+    }
     // Dijkstra's algorithm to find shortest path from 'start' to 'end'
     int dijkstra(int start, int end) {
         vector<int> distance(size, INF);  // Initialize all distances as INF
@@ -139,6 +152,7 @@ class FindPath {
             for (int k = 0; k < y; k++) {
                 g->addEdgeList(indexing(x - 1, k, y), size, 0);
             }
+            g->printGraph();
             return g->dijkstra(size + 1, size);
             // populated the graph
         }
