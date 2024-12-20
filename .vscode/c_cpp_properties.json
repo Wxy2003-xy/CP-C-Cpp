@@ -7,7 +7,7 @@
             ],
             "defines": [],
             "macFrameworkPath": [
-                "/Library/Developer/CommandLineTools/usr/bin"
+                "/Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk/usr/include/c++"
             ],
             "cStandard": "gnu17",
             "cppStandard": "gnu++17",
