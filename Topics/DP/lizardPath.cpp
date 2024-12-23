@@ -7,6 +7,7 @@
 #include<set>
 #include<limits>
 using namespace std;
+using namespace chrono;
 /*
 4*5 example: 
 1 2 4 3 6
@@ -54,15 +55,12 @@ public:
     void addEdgeList(int src, int dest, int weight) {
         this->adjList[src].push_back(make_pair(dest, weight));
         this->adjList[dest].push_back(make_pair(src, weight));
-        cout<< "adding: "<< src << " --> " << dest<<" weight: "<< weight <<endl;
     }
     void addEdgeListDirected(int src, int dest, int weight) {
         this->adjList[src].push_back(make_pair(dest, weight));
-        cout<< "adding: "<< src << " --> " << dest<<" weight: "<< weight <<endl;
     }
     void printGraph() {
         for (int i = 0; i < adjList.size(); i++) {
-            cout<<"Node " <<i<<": ";
             for (int j = 0; j < adjList[i].size(); j++) {
                 cout << adjList[i][j].first << ", ";
             }
@@ -78,7 +76,7 @@ public:
         distance[start] = 0;
         pq.push({0, start});  // Push the starting node with distance 0
 
-        while (!pq.empty()) {`
+        while (!pq.empty()) {
             int currentDist = pq.top().first;
             int u = pq.top().second;
             pq.pop();
@@ -141,31 +139,86 @@ class FindPath {
             for (int j = 0; j < y; j++) {
                 g->addEdgeListDirected(indexing(x-1, j, y), size, board[x-1][j]);
             }
-            g->printGraph();
+            // g->printGraph();
             return g->dijkstra(size + 1, size);
             // populated the graph
         }
         int dp_solution() {
-
+            int memo[x][y];
+            for (int i = 0; i < y; i++) {
+                memo[0][i] = board[0][i];
+            }
+            for (int i = 1; i < x; i++) {
+                for (int j = 0; j < y; j++) {
+                    if (j == 0) {
+                        memo[i][j] = min(memo[i - 1][j + 1], memo[i - 1][j]) + board[i][j];
+                        continue;
+                    }
+                    if (j == y - 1) {
+                        memo[i][j] = min(memo[i - 1][j - 1], memo[i - 1][j]) + board[i][j];
+                        continue;
+                    }
+                    int m = min(min(memo[i - 1][j - 1], memo[i - 1][j]), memo[i - 1][j + 1]);
+                    memo[i][j] = m + board[i][j];
+                }
+            }
+            int ans = 1e9;
+            for (int i = 0; i < y; i++) {
+                ans = min(ans, memo[x - 1][i]);
+            }
+            // for (int i = 0; i < x; i++) {
+            //     for (int j = 0; j < y; j++) {
+            //         cout<<memo[i][j]<<" ";
+            //     }
+            //     cout<<"\n";
+            // }
+            return ans;
         }
 };
 
 int main() {
-        vector<vector<int>> board = {
-        {1, 2, 4, 3, 6},
-        {2, 4, 6, 2, 3},
-        {5, 4, 3, 1, 2},
-        {1, 2, 5, 4, 6}
-    };
+    //     vector<vector<int>> board = {
+    //     {1, 2, 4, 3, 6},
+    //     {2, 4, 6, 2, 3},
+    //     {5, 4, 3, 1, 2},
+    //     {1, 2, 5, 4, 6}
+    // };
     
+    // // Initialize FindPath with dimensions of the board and the board itself
+    // FindPath fp(4, 5, board);
+    srand(time(0)); // Seed for random number generation
+
+    // Set the dimensions of the board
+    int x = 1000; // Number of rows
+    int y = 1000; // Number of columns
+
+    // Generate a large board with random values between 1 and 10
+    vector<vector<int>> board(x, vector<int>(y));
+
+    for (int i = 0; i < x; i++) {
+        for (int j = 0; j < y; j++) {
+            board[i][j] = rand() % 10 + 1; // Random number between 1 and 10
+        }
+    }
+
     // Initialize FindPath with dimensions of the board and the board itself
-    FindPath fp(4, 5, board);
+    FindPath fp(x, y, board);
     
     // Call naiveGraphFind to get the shortest path from the top to the bottom
+    auto start_naive = high_resolution_clock::now(); // Start time
     int result = fp.naiveGraphFind();
-    
+    auto end_naive = high_resolution_clock::now(); // Start time
+    auto duration_naive = duration_cast<milliseconds>(end_naive - start_naive);
+    cout << "Time taken by naiveGraphSearch: " << duration_naive.count() << " ms" << endl;
+    auto start_memo = high_resolution_clock::now(); // Start time
+    int result2 = fp.dp_solution();
+    auto end_memo = high_resolution_clock::now();   // End time
+    auto duration_memo = duration_cast<milliseconds>(end_memo - start_memo);
+    cout << "Time taken by memoMax: " << duration_memo.count() << " ms" << endl;
     // Print the result
     cout << "Shortest path weight: " << result << endl;
+    cout << "Shortest path weight: " << result2 << endl;
+
     
     return 0;
 }
