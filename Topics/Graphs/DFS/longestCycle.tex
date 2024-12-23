@@ -1,0 +1,139 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}    % For UTF-8 character encoding
+\usepackage[T1]{fontenc}       % For proper font encoding
+\usepackage{lmodern}           % Improved font rendering
+\usepackage{amsmath}   % For advanced mathematical formatting
+\usepackage{amssymb}   % For mathematical symbols
+\usepackage{geometry}  % Adjust page margins
+\usepackage{enumerate} % For custom lists
+\usepackage{xcolor}  % for coloring
+\usepackage{amsthm}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}[theorem]{Definition}
+\usepackage{listings}  % for code listings
+
+\lstset{frame=tb,
+  language=C,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,   
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{brown},
+  stringstyle=\color{orange},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3
+}
+\geometry{top=1in, bottom=1in, left=1in, right=1in}
+
+\begin{document}
+
+\title{Longest Cycle in a Graph}
+\author{Wang Xiyu}
+\date{23 Dec 2024}
+\maketitle
+
+\section*{Problem Statement}
+Given a directed weighted graph, find the length of the longest cyclic path. 
+\section*{Problem Constraints}
+\subsection*{Easy}
+0..1 outgoing edge per node.
+\subsection*{Generalized}
+0..* outgoing edges per node.
+\subsection*{Variation}
+The graph is acyclic, find the longest path (critical path). All edges have non-negative weights.
+\section*{Concept Proof}
+\subsection*{Easy}
+Since $\forall v \in V, |E_v: \{e | e \in E \land e(v, v')\}| <= 1$, $!\exists e \in E, e$ 
+belongs to more than one possible cycle, and $!\exists v \in V, v$ belongs to more than one possible cycle.
+$\implies$ if we have visited a $v \in G$, 
+
+\begin{theorem}
+    If there exist more than one cycle in a graph of said constraints, they are in disconnected components.
+\end{theorem}
+\begin{proof}
+    \indent From the definition of cycle, and problem constriants,
+    \[\forall v \in C, (v, v') \in E \implies v' \in C\]
+    Which implies a cycle would not have an outgoing edge. Group all $v \in C$ to $v'', v'' $ has no outgoing edge $\implies v'' $ is a sink.
+    Suppose there are more than one cycle in a connected component in 
+    $G, $
+    \[\exists v\in V, \forall v_{C1} \in C_1, \forall v_{C2} \in C_2, v \vdash^* v_{C1} \land v \vdash^* v_{C2}\]
+    $\implies \exists v_{branch}(v \vdash^* v_{branch} \land v_{branch} \vdash v_{C1} \land v_{branch} \vdash v_{C2})$ has more than one outgoing edge, a contradiction.
+\end{proof}
+\noindent Therefore, it is possible to enumerate all cycles in $G$ in one iteration of the edge array, and the longest among which is the solution.
+\subsection*{Generalized}
+The generalized version of this problem is NP-Complete, as it can be reduced from Hamitonian Circuit. Scenario-specific techniques need to be employed
+to derive an efficient algorithm. 
+
+\begin{theorem}
+    Longest cycle in a directed weighted graph is NP-Complete.
+\end{theorem}
+\begin{proof} 
+    Longest cycle is NP. \newline
+    \newline
+    Consider the decision version of the problem: if $\exists $ a cycle in graph $G$ that has total lenght $\geq k$.
+    It is trivial to show that both checking if a set of vertices forms a cycle, and summing up the lenght of involved edges takes polynomial time. 
+    \newline
+    Longest cycle is NP-hard.\newline
+    \newline
+    Equivalent to Longest path in directed graph, by starting and ending in the same vertex.
+\end{proof}
+\subsection*{Variation: Longest path in DAG}
+use topological sort and DP 
+\section*{Solution}
+\subsection*{Easy}
+\begin{lstlisting}
+class Solution {
+    public:
+        int maxLength = -1;
+        void getcycle(vector<int> &edges,int start,
+                    vector<bool>& visit,vector<int>& store){
+            if(start == -1)return ; // if prev node leads to nowhere, current node is a sink
+            if(visit[start]){ // if the node is already visited
+                int count = -1; 
+                for(int i =0;i<store.size();i++){
+                    if(store[i]==start){ // if current node has been recorded
+                        count = i; // set count to be the index of start in store
+                        break;
+                    }
+                }
+                if(count==-1)return; // if current node is not found in a path 
+                                     // -> no cycle in current component
+                int size = (store.size()-count); 
+                maxLength = max(maxLength,size); // update current max cycle length
+                return ;
+            }
+            visit[start] = true; // mark this node as visited
+            store.push_back(start); // mark this node as appeared in current path
+            getcycle(edges,edges[start],visit,store); // edges[start] -> start.next
+            return ; // finish exploring a component
+        }
+        int longestCycle(vector<int>& edges) { 
+            vector<bool> visit(edges.size(),0);
+            for(int i =0;i<edges.size();i++){
+                if(visit[i])continue; // node i is in an already explored component
+                vector<int> store;
+                getcycle(edges,i,visit,store); // find the cycle length 
+                                               // (if existent) in the component containing i
+            }
+            return maxLength;
+        }
+    };
+\end{lstlisting}
+
+\subsection*{Variation: Longest path in DAG}
+\begin{lstlisting}
+    class Solution {
+        public:
+            vector<int> dist;
+            vector<bool> visited;
+            void dfs(vector)
+    };
+\end{lstlisting}
+\end{document}
