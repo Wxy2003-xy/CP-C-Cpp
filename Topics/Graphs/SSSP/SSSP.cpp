@@ -91,6 +91,25 @@ public:
 
         return INF;  // If there's no path from start to end
     }
+    int bellman_ford(int start, int end) {
+        // use addEdge
+        vector<int> dist(size, INF);
+        dist[start] = 0;
+        for (int i = 0; i < size - 1; i++) {
+            for (int j = 0; j < edges.size(); j++) {
+                int src = get<0>(edges[j]);
+                int dest = get<1>(edges[j]);
+                int weight = get<2>(edges[j]);
+                if (dist[src] != INF && dist[src] + weight < dist[dest]) {
+                    if (i == nodes.size() - 1) {
+                        return -1; // negative cycle detected
+                    }
+                    dist[dest] = dist[src] + weight;
+                }
+            }
+        }
+        return dist[end];
+    }
 };
 
 int main() {
@@ -109,13 +128,10 @@ int main() {
 
     // Call Dijkstra's algorithm to find the shortest path from node 0 to node 4
     int result = g.dijkstra(0, 4);
-
+    int result2 = g.bellman_ford(0, 4);
     // Output the result
-    if (result == INF) {
-        cout << "No path found from 0 to 4." << endl;
-    } else {
-        cout << "Shortest path from 0 to 4: " << result << endl;
-    }
+    cout << "Shortest path from 0 to 4: (Dijkstra)" << result << endl;
+    cout << "Shortest path from 0 to 4: (Bellman ford)" << result2 << endl;
 
     return 0;
 }
