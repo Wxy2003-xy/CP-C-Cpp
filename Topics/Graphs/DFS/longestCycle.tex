@@ -50,8 +50,8 @@ Given a directed weighted graph, find the length of the longest cyclic path.
 The graph is acyclic, find the longest path (critical path). All edges have non-negative weights.
 \section*{Concept Proof}
 \subsection*{Easy}
-Since $\forall v \in V, |E_v: \{e | e \in E \land e(v, v')\}| <= 1$, $!\exists e \in E, e$ 
-belongs to more than one possible cycle, and $!\exists v \in V, v$ belongs to more than one possible cycle.
+Since $\forall v \in V, |E_v: \{e | e \in E \land e(v, v')\}| <= 1$, $\nexists e \in E, e$ 
+belongs to more than one possible cycle, and $\nexists v \in V, v$ belongs to more than one possible cycle.
 $\implies$ if we have visited a $v \in G$, 
 
 \begin{theorem}

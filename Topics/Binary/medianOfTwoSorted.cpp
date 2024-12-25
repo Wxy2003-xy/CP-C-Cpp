@@ -73,7 +73,7 @@ public:
 
     double helper(vector<int>& a, vector<int>& b, int end_idx, int shorter, int half) {
         int from1 = end_idx + 1;
-        if 
+        return 0; //TODO
 
     }
 
