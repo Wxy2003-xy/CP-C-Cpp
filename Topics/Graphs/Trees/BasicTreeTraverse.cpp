@@ -104,7 +104,31 @@ public:
         level_order_traverse_max(root, 0, result);
         return result;
     }
-
+    vector<int> largestValuesWithBFS(TreeNode* root) {
+        if (!root) {
+            return {};
+        }
+        vector<int> result;
+        queue<pair<TreeNode*, int>> q; // <node, level>
+        q.push({root, 0});
+        while (!q.empty()) {
+            pair<TreeNode*, int> curr = q.front();
+            q.pop();
+            TreeNode* n = curr.first;
+            int level = curr.second;
+            if (result.size() <= level) {
+                result.resize(level + 1, INT_MIN);
+            }
+            result[level] = max(result[level], n->val);
+            if (n->left) {
+                q.push({n->left, level + 1});
+            }
+            if (n->right) {
+                q.push({n->right, level + 1});
+            }
+        }
+        return result;
+    }    
 };
 
 int main() {
