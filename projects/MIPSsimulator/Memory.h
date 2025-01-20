@@ -17,48 +17,83 @@
  *      @physical_PC: (uint32_t*) program counter mapped to the actual physical address;
 */
 class Memory {
+    public: 
+        int get_physical_address(uint32_t* simulation_address, uint32_t* physical_address) {
 
+        }
 };
+
+/** 
+ * @class Instruction_memory
+ * @brief This class emulate a fixed sized instruction memory block, containing one consecutive block of physical memory
+ *          allocated upon initialization. 
+ * @param PCStart the memory address of the starting byte in instruction memory block, finalized upon initialization, used
+ *          as the offset to compute physical address from virtual address used by the CPU simulation.
+ *          * updated every cycle
+*/
 
 class Instruction_Memory : public Memory {
     protected:
         /**
-         * @param sim
+         * @param simulation_address virtual address referred by the CPU simulation
+         * @param physical_address actual address referred by instruction memory component 
+         * @brief this function maps virtual address referred by the CPU simulation to the actual 
+         *          physical address to be used in the memory component
         */
-        int map_instruction_address(uint32_t* simulation_address, uint32_t* physical_address) {
-            *simulation_address = *physical_address - this->PCstart;
+        int get_physical_address(uint32_t* simulation_address, uint32_t* physical_address) {
+            *simulation_address = *physical_address + this->PCstart;
             //TODO: exception handling
             return 0;
         }
+        /**
+         * @param simulation_address virtual address referred by the CPU simulation
+         * @param physical_address actual address referred by instruction memory component 
+         * @brief this function get the virtual memory address from the physical address to pass to the CPU simulation
+        */
         int reverse_map_instruction_address(uint32_t* simulation_address, uint32_t* physical_address) {
-            *physical_address = *simulation_address + this->PCstart;
-            //TODO: exception handling
+            if (*simulation_address < PCstart) {
+                return -1;
+            }
+            *physical_address = *simulation_address - this->PCstart;
             return 0;
         }
     public: 
-        uint32_t* instructions;
-        uint32_t PCstart;
-        uint32_t* virtual_PC;
+        int max_instruction_size; // unmodifiable instruciton memory size 
+        uint32_t* instruction_memory;  // Array of instructions to store
+        uint32_t PCstart; // Offset 
+        uint32_t* virtual_PC;   // virtual_PC counter 
         uint32_t* physical_PC;  // const offset = PCstart between physical and virtual PC
         Instruction_Memory(int instruction_size) { // assign the real starting address of instruction memory in simulation 
-            this->instructions = (uint32_t*) malloc(sizeof(uint32_t) * instruction_size);
-            PCstart = *instructions;
+            this->max_instruction_size = instruction_size;
+            this->instruction_memory = (uint32_t*) malloc(sizeof(uint32_t) * max_instruction_size);
+            PCstart = *instruction_memory; // set offset to the starting address of memory block
+            *physical_PC = PCstart;
+            *virtual_PC = 0;
         }
 
         int fetch_instruction_tmp_register(uint32_t* simulation_address, Register* instruction_register) {
-            instruction_register->write_register_from_32bit_immd(&this->instructions[*simulation_address]);
+            // update program counters
+            *virtual_PC = *simulation_address;
+            *physical_PC = *virtual_PC + PCstart;
+            // fetch instruction
+            instruction_register->write_register_from_32bit_immd(&this->instruction_memory[*virtual_PC]);
             return 0;
         }
 
+        /**
+         * @param instruction_register instruction fetch destination 
+         * @brief a short hand function to fetch next instruction that is not affected by jump 
+        */
+
+        int get_next_instruction(Register* instruction_register) {
+            physical_PC++;
+            virtual_PC++;
+            instruction_register->write_register_from_32bit_immd(&this->instruction_memory[*virtual_PC]);
+        }
         
-        int fetch_instruction_from_virtual_address(uint32_t* simulation_address, uint32_t* instruction_register) {
-            *instruction_register = this->instructions[*simulation_address];
-            return 0;
-        }
-
         int fetch_instruction_from_physical_address(uint32_t* physical_address, uint32_t* instruction_register) {
-            if (map_instruction_address(this->virtual_PC, physical_address)) {
-                *instruction_register = this->instructions[*virtual_PC];
+            if (get_physical_address(this->virtual_PC, physical_address)) {
+                *instruction_register = this->instruction_memory[*virtual_PC];
                 return 0;
             }
             return 1;
@@ -68,6 +103,9 @@ class Instruction_Memory : public Memory {
             //TODO: exception handling
             return 0;
             
+        }
+        ~Instruction_Memory() {
+
         }
     friend class CPU;
 };
@@ -82,6 +120,10 @@ class Data_Memory : public Memory {
         uint32_t* data;
         Data_Memory(int data_size) {
             this->data = (uint32_t*) malloc(sizeof(uint32_t) * data_size);
+        }
+
+        int read_memory(uint32_t* data_address, Register* data_register) {
+            data_register->write_register_from_32bit_immd(&this->data[*data_address]);
         }
     friend class CPU;
 };

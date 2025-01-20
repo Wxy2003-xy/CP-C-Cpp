@@ -67,6 +67,7 @@ struct uint4_t {
         return value;
     }
 };
+// uint7_t for all control
 struct uint7_t {
     uint8_t value : 7;
     uint7_t(uint8_t val = 0) { 

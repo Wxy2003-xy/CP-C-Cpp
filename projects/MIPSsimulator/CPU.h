@@ -67,6 +67,7 @@ class CPU {
         uint5_t shamt; //[10:6]
         uint6_t func; //[5:0]
         uint16_t immd; //[15:0]
+        uint32_t tmp_data_read;
     public:
         CPU(int instruction_size, int data_size) 
             : instruction_memory(make_unique<Instruction_Memory>(instruction_size)),
@@ -80,13 +81,13 @@ class CPU {
             PC_src_MUX = new MUX<uint32_t>(&next_PC, &branch_address, &branch, &next_PC);
             mem_to_reg_MUX = new MUX<uint32_t>(&alu_result, this->data_memory->memory_read, &mem_to_reg, this->register_file.WD);
         }
-        int __instruction_fetch() {
+        int _instruction_fetch() {
             uint32_t* current_instruction = this->instruction_memory->virtual_PC;
             this->instruction_memory->fetch_instruction_tmp_register(current_instruction, this->tmp_instr_register);
             return 0;
 
         }
-        int __instruction_decode() {
+        int _instruction_decode() {
             uint32_t instruction_value = this->tmp_instr_register->read_register();
             INSTRUCTION_TYPE type = instruction_type(&instruction_value);
             if (type == r) {
@@ -100,16 +101,16 @@ class CPU {
             }
             return 0;
         }
-        int __execute_alu() {
+        int _execute_alu() {
             this->alu.compute(&alu_result, &is_zero, this->register_file.RD1,
                               &alu_src_source2, &this->control.alu_ctrl);
             // TODO: forwarding pipeline
             return 0;
         }
-        int __memory() {
+        int _memory() {
             return 0;
         }
-        int __write_back() {
+        int _write_back() {
             this->register_file.write_back_register();
             return 0;
         }

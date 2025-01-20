@@ -34,18 +34,32 @@
 
 \begin{document}
 
-\title{}
+\title{Poor pigs}
 \author{Wang Xiyu}
-\date{}
+\date{26 Dec 2024}
 \maketitle
 
 \section*{Problem Statement}
+Given integer $n, t_1, t_2$, number of buckets, among which exactly one bucket contains poison; 
+time taken for poison to kill a pig, and total time allowed. Find the minimum number of pigs needed to
+find the bucket containing poison within total time allowed.
 \section*{Problem Constraints}
-\subsection*{Easy}
-\subsection*{Generalized}
-\subsection*{Variation}
 \section*{Concept Proof}
-
+\begin{theorem}
+    $p$ pigs and $q$ attempts can find the poisonous bucket among $(q+1)^p$ buckets.
+\end{theorem}
+\begin{proof}
+    Proof by Induction: 
+    \subsection*{Induction over attempts} 
+    Base case: One attempt allowed $\implies 2^p$ buckets to be searched. Encode each bucket in binary,
+    where at digit $i$ a 0 represents it not being consumed by pig $i$, 1 otherwise. It is clear that for every possible 
+    poisonous bucket, there exists a unique pattern of dead pigs, thus sufficient to identify the bucket. 
+    \newline
+    Inductive step: Suppose with $q$ attempts, $(q+1)^p$ buckets can be searched. 
+\end{proof}
+\begin{corollary}
+    To find the poisonous bucket among $n$ buckets, in $x$ attempts, $\lceil log_x(n) \rceil$ pigs are needed.
+\end{corollary}
 \section*{Solution}
 \subsection*{Easy}
 
